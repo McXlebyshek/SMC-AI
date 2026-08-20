@@ -1,0 +1,128 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "git *": "allow",
+      "git push --force*": "deny",
+      "sqlite3 *": "allow",
+      "rm -rf *": "deny"
+    }
+  },
+
+  "attachment": {
+    "image": {
+      "auto_resize": true,
+      "max_width": 1568,
+      "max_height": 1568
+    }
+  },
+
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 6000
+  },
+
+  "provider": {
+    "llama": {
+      "name": "Local Qwen",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:8000/v1",
+        "apiKey": "local",
+        "timeout": 900000,
+        "chunkTimeout": 60000
+      },
+      "models": {
+        "qwen3.6-35b-a3b": {
+          "name": "Qwen3.6-35B-A3B local",
+          "limit": { "context": 98304, "output": 8192 },
+          "reasoning": true,
+          "tool_call": true,
+          "modalities": { "input": ["text", "image"], "output": ["text"] }
+        }
+      }
+    }
+  },
+  "model": "llama/qwen3.6-35b-a3b",
+
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git"
+  ],
+
+  "lsp": {
+    "typescript": {
+      "command": [
+        "typescript-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs",
+        ".mts",
+        ".cts"
+      ],
+      "disabled": false
+    },
+
+    "yaml-ls": {
+      "command": [
+        "yaml-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".yaml",
+        ".yml"
+      ],
+      "disabled": false
+    }
+  },
+
+  "mcp": {
+    "TestSprite": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@testsprite/testsprite-mcp@latest"
+      ],
+      "enabled": true,
+      "environment": {
+        "API_KEY": "{env:TESTSPRITE_API_KEY}"
+      }
+    },
+
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "enabled": true
+    },
+
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "X-MCP-Toolsets": "repos,issues,pull_requests"
+      }
+    }
+  }
+}
