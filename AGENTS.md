@@ -6,15 +6,17 @@
 
 **Основной документ:** `TZ_SMC_ICT_chart_analyzer.md`
 
+**Текущий статус:** Этап 1 — Data pipeline (заготовка: BybitClient в `data/bybit_client.py`)
+
 ---
 
 ## 🎯 Цель проекта
 
 Система, которая:
-1. Получает рыночные данные (BTCUSDT, EURUSD, DXY и др.) в разных таймфреймах
+1. Получает рыночные данные (BTCUSDT, ETHUSDT, SOLUSDT, BNBUSDT, XRPUSDT) через Bybit/ccxt в таймфреймах 1W, 1D, 4H, 1H, 15m
 2. Строит свечной график программно
 3. Размечает SMC/ICT паттерны: order block, FVG, swing high/low, liquidity sweep, BOS/CHoCH
-4. Применяет логику сессий (Asian/London/NY) и дней недели
+4. Применяет логику сессий (Asian 00:00-02:00, London 07:00-10:00, NY 13:00-16:00, NY extend 16:00-20:00 UTC) и дней недели
 5. Учитывает календарь новостей (NFP, CPI, FOMC)
 6. Выдаёт структурированный результат: bias, уровни (POI), сценарий, уверенность
 
@@ -22,10 +24,25 @@
 
 ---
 
+## 📂 Структура проекта
+
+```
+├── config/
+│   ├── symbols.yaml          # Символы, таймфреймы, сессии
+│   └── model_config.yaml     # Конфигурация VLM (Qwen3.6-35B-A3B)
+├── data/
+│   └── bybit_client.py       # Клиент Bybit через ccxt (заготовка)
+├── requirements.txt          # Зависимости Python
+├── opencode.jsonc            # Конфигурация OpenCode
+└── AGENTS.md                 # Этот файл
+```
+
+---
+
 ## 🏗️ Архитектура
 
 ```
-[Market Data] → [Data Pipeline] → [Chart Renderer] ─┐
+[Bybit/ccxt] → [Data Pipeline] → [Chart Renderer] ─┐
                                                        ├→ [Orchestrator] → [VLM] → [JSON Output]
 [Knowledge Base/RAG] ──────────────────────────────────┤
                                                        │
@@ -38,13 +55,15 @@
 
 | Компонент | Технология |
 |-----------|------------|
-| Backend | Python, FastAPI |
-| Данные | ccxt (крипто), Twelve Data/OANDA (форекс/DXY), pandas |
-| График | mplfinance / lightweight-charts-python / plotly |
-| VLM | Локальная модель через Ollama/vLLM |
-| RAG | Chroma/Qdrant + embedding model |
-| Хранение | SQLite/PostgreSQL |
-| Деплой | Docker-compose |
+| Backend | Python, FastAPI, uvicorn |
+| Данные | ccxt (Bybit), pandas |
+| График | mplfinance, plotly, kaleido |
+| VLM | Qwen3.6-35B-A3B-UD-Q4_K_XL (llama.cpp сервер, порт 8000) |
+| RAG | ChromaDB + sentence-transformers |
+| Хранение | SQLite (aiosqlite, sqlalchemy) |
+| Конфигурация | YAML (PyYAML) |
+| Тестирование | pytest, pytest-asyncio |
+| Утилиты | loguru, rich, python-dotenv |
 
 ---
 

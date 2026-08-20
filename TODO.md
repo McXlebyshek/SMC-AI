@@ -12,7 +12,7 @@
 ## Этап 0. Фиксация scope и архитектуры
 - [X] `config/symbols.yaml`: Создать конфигурационный файл с целевыми парами Bybit (например, `BTCUSDT`, `ETHUSDT`) и таймфреймами (1W, 1D, 4H, 1H, 15m).
 - [X] `config/model_config.yaml`: Зафиксировать настройки локальной VLM (модель, url эндпоинта, system prompt).
-- [Х] `requirements.txt`: Сформировать базовый список зависимостей (ccxt, pandas, pydantic, pytest и др.).
+- [X] `requirements.txt`: Сформировать базовый список зависимостей (ccxt, pandas, pydantic, pytest и др.).
 
 ## Этап 1. Data pipeline (Получение рыночных данных Bybit)
 - [ ] `data/bybit_client.py`: Написать класс-обертку поверх `ccxt` для Bybit (только инициализация и проверка соединения).
