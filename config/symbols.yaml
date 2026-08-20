@@ -1,0 +1,86 @@
+# SMC/ICT Chart Analyzer — Configuration
+# Target symbols and timeframes for analysis
+
+symbols:
+  # ————————————————————————————
+  # Crypto (Bybit)
+  # ————————————————————————————
+  - symbol: BTCUSDT
+    exchange: bybit
+    base_asset: BTC
+    quote_asset: USDT
+    category: crypto
+
+  - symbol: ETHUSDT
+    exchange: bybit
+    base_asset: ETH
+    quote_asset: USDT
+    category: crypto
+
+  - symbol: SOLUSDT
+    exchange: bybit
+    base_asset: SOL
+    quote_asset: USDT
+    category: crypto
+
+  - symbol: BNBUSDT
+    exchange: bybit
+    base_asset: BNB
+    quote_asset: USDT
+    category: crypto
+
+  - symbol: XRPUSDT
+    exchange: bybit
+    base_asset: XRP
+    quote_asset: USDT
+    category: crypto
+
+  # ————————————————————————————
+  # Forex / Commodities (Bybit — if available via CFDs,
+  # otherwise note: use OANDA / Twelve Data for these)
+  # ————————————————————————————
+  # NOTE: EURUSD, GBPUSD, DXY are typically NOT on Bybit.
+  # They should be fetched via OANDA / Twelve Data.
+  # Keep them here as placeholder for multi-exchange pipeline.
+  # - symbol: EURUSDT
+  #   exchange: bybit
+  #   base_asset: EUR
+  #   quote_asset: USDT
+  #   category: crypto
+
+timeframes:
+  - 1W
+  - 1D
+  - 4H
+  - 1H
+  - 15m
+
+analysis:
+  # Default symbols for quick analysis
+  default_symbols:
+    - BTCUSDT
+    - ETHUSDT
+
+  # Default timeframes for quick analysis
+  default_timeframes:
+    - 1D
+    - 4H
+    - 1H
+
+  # Minimum candles required for reliable SMC detection
+  min_candles: 500
+
+  # Session definitions (UTC)
+  sessions:
+    asian:
+      start: "00:00"
+      end: "02:00"
+    london:
+      start: "07:00"
+      end: "10:00"
+    ny:
+      start: "13:00"
+      end: "16:00"
+    ny_extend:
+      start: "16:00"
+      end: "20:00"

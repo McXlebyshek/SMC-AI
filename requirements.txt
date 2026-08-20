@@ -1,0 +1,49 @@
+# ============================================================
+# SMC/ICT Chart Analyzer — базовые зависимости
+# ============================================================
+
+# --- Web API / Framework ---
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# --- Data handling ---
+pandas>=2.2.0
+numpy>=2.1.0
+python-dateutil>=2.9.0
+
+# --- Market data ---
+ccxt>=4.4.00
+
+# --- Charting ---
+mplfinance>=0.12.10b0
+plotly>=6.0.0
+kaleido>=0.2.1
+
+# --- LLM / VLM client ---
+openai>=1.50.0
+httpx>=0.28.0
+
+# --- RAG / Vector DB ---
+chromadb>=0.6.0
+
+# --- Embeddings ---
+sentence-transformers>=3.3.0
+
+# --- Database ---
+sqlalchemy>=2.0.36
+aiosqlite>=0.20.0
+
+# --- Config ---
+pyyaml>=6.0.2
+
+# --- Testing ---
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+httpx>=0.28.0
+
+# --- Utilities ---
+python-dotenv>=1.0.1
+loguru>=0.7.2
+rich>=13.9.0

@@ -1,0 +1,55 @@
+# VLM Configuration
+# Локальная мультимодальная модель для интерпретации разметки SMC/ICT паттернов
+
+model:
+  name: "Qwen3.6-35B-A3B-UD-Q4_K_XL"
+  url: "http://127.0.0.1:8000"
+  endpoint: "/v1/chat/completions"
+  timeout: 300
+  max_tokens: 4096
+  temperature: 0.1
+  top_p: 0.9
+  response_format:
+    type: "json_object"
+
+server:
+  model_path: "G:\\AI Model\\Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf"
+  mmproj_path: "G:\\AI Model\\mmproj-BF16.gguf"
+  mmproj_offload: false
+  image_min_tokens: 1024
+  host: "127.0.0.1"
+  port: 8000
+  gpu_layers: 99
+  n_cpu_moe: 34
+  context: 98304
+  batch_size: 4096
+  ub: 1024
+  threads: 8
+  flash_attention: true
+  context_k_type: "q8_0"
+  context_v_type: "q8_0"
+  jinja: true
+  parallel: 1
+  load_mode: "none"
+  reasoning_preserve: true
+
+system_prompt: |
+  Ты — опытный трейдер и аналитик, специализирующийся на методологии Smart Money Concept (SMC) и ICT.
+
+  Твоя задача: проанализировать предоставленный свечной график, уже размеченные алгоритмически найденные зоны SMC/ICT паттернов, а также сопутствующую информацию (сессии, дни недели, экономические события), и сформировать структурированный торговый анализ.
+
+  ВАЖНО: Не ищи паттерны на графике самостоятельно — они уже размечены алгоритмическим детектором. Твоя роль — интерпретировать уже размеченные данные и сформировать нарратив/сценарий.
+
+  Правила:
+  1. Проанализируй все размеченные паттерны: Order Blocks, Fair Value Gaps, Swing High/Low, Liquidity Sweeps, BOS/CHoCH.
+  2. Определи общий bias (bullish/bearish/neutral) с учётом множественных таймфреймов.
+  3. Выдели ключевые уровни (POI — Points of Interest) с указанием цен.
+  4. Сформулируй сценарий: что должно произойти для подтверждения бычьего/медвежьего сценария.
+  5. Оцени уверенность (0-100%) на основе количества и качества подтверждений.
+  6. Учитывай текущий статус сессий (Asian/London/NY) и дни недели.
+  7. Укажи риски, связанные с ближайшими экономическими событиями.
+
+  Отвечай строго в JSON-формате, без дополнительных текстов.
+
+schema_version: "1.0"
+last_updated: "2026-08-20"
