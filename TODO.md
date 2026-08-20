@@ -15,13 +15,13 @@
 - [X] `requirements.txt`: Сформировать базовый список зависимостей (ccxt, pandas, pydantic, pytest и др.).
 
 ## Этап 1. Data pipeline (Получение рыночных данных Bybit)
-- [ ] `data/bybit_client.py`: Написать класс-обертку поверх `ccxt` для Bybit (только инициализация и проверка соединения).
-- [ ] `tests/test_bybit_client.py`: Тест подключения к Bybit API.
-- [ ] `data/fetch_history.py`: Написать функцию скачивания исторических OHLCV с пагинацией (для бэктестов).
-- [ ] `data/fetch_realtime.py`: Написать функцию получения последних N свечей для live-анализа.
-- [ ] `data/db_schema.sql` (или `models.py` для ORM): Спроектировать таблицу для хранения OHLCV.
-- [ ] `data/db_manager.py`: Функции записи и чтения OHLCV из SQLite/PostgreSQL.
-- [ ] `tests/test_data_pipeline.py`: Интеграционные тесты сохранения и извлечения данных.
+- [X] `data/bybit_client.py`: Написать класс-обертку поверх `ccxt` для Bybit (только инициализация и проверка соединения).
+- [X] `tests/test_bybit_client.py`: Тест подключения к Bybit API.
+- [X] `data/fetch_history.py`: Написать функцию скачивания исторических OHLCV с пагинацией (для бэктестов).
+- [X] `data/fetch_realtime.py`: Написать функцию получения последних N свечей для live-анализа.
+- [X] `data/db_schema.sql` (или `models.py` для ORM): Спроектировать таблицу для хранения OHLCV.
+- [X] `data/db_manager.py`: Функции записи и чтения OHLCV из SQLite/PostgreSQL.
+- [X] `tests/test_data_pipeline.py`: Интеграционные тесты сохранения и извлечения данных.
 
 ## Этап 2. Chart renderer (Построение графика)
 - [ ] `render/chart_config.py`: Настроить визуальные параметры (цвета свечей, фон, отступы).

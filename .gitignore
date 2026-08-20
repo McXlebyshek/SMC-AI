@@ -44,7 +44,6 @@ env/
 
 # Data
 *.parquet
-data/
 
 # Logs
 *.log
