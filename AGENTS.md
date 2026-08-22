@@ -1,187 +1,82 @@
-# AGENTS.md — Руководство для AI-агентов
+# AGENTS.md — SMC/ICT Chart Analyzer
 
-## 📋 Проект: SMC/ICT Chart Analyzer
+## Project: SMC/ICT Chart Analyzer
+**Goal:** Automated financial market analysis — algorithmic SMC/ICT pattern detection (OHLCV-based) + VLM interpretation.
+**Spec:** `TZ_SMC_ICT_chart_analyzer.md` | **Roadmap:** `TODO.md`
+**Status:** Stage 1 complete (data pipeline). Stages 3–4 ready to start.
 
-**Цель:** Система автоматического анализа финансовых рынков с использованием локальной VLM, базы знаний SMC/ICT и алгоритмического детектирования паттернов.
-
-**Основной документ:** `TZ_SMC_ICT_chart_analyzer.md`
-
-**Текущий статус:** Этап 1 — Data pipeline (заготовка: BybitClient в `data/bybit_client.py`)
-
----
-
-## 🎯 Цель проекта
-
-Система, которая:
-1. Получает рыночные данные (BTCUSDT, ETHUSDT, SOLUSDT, BNBUSDT, XRPUSDT) через Bybit/ccxt в таймфреймах 1W, 1D, 4H, 1H, 15m
-2. Строит свечной график программно
-3. Размечает SMC/ICT паттерны: order block, FVG, swing high/low, liquidity sweep, BOS/CHoCH
-4. Применяет логику сессий (Asian 00:00-02:00, London 07:00-10:00, NY 13:00-16:00, NY extend 16:00-20:00 UTC) и дней недели
-5. Учитывает календарь новостей (NFP, CPI, FOMC)
-6. Выдаёт структурированный результат: bias, уровни (POI), сценарий, уверенность
-
-**Ключевая идея:** Алгоритмический детектор находит паттерны по OHLCV (точность), VLM интерпретирует разметку (нарратив/сценарий). VLM не детектирует паттерны с картинки — она работает как аналитик.
-
----
-
-## 📂 Структура проекта
-
-```
-├── config/
-│   ├── symbols.yaml          # Символы, таймфреймы, сессии
-│   └── model_config.yaml     # Конфигурация VLM (Qwen3.6-35B-A3B)
-├── data/
-│   └── bybit_client.py       # Клиент Bybit через ccxt (заготовка)
-├── requirements.txt          # Зависимости Python
-├── opencode.jsonc            # Конфигурация OpenCode
-└── AGENTS.md                 # Этот файл
-```
-
----
-
-## 🏗️ Архитектура
-
-```
-[Bybit/ccxt] → [Data Pipeline] → [Chart Renderer] ─┐
-                                                       ├→ [Orchestrator] → [VLM] → [JSON Output]
-[Knowledge Base/RAG] ──────────────────────────────────┤
-                                                       │
-[Rules Engine: Sessions/Days/News] ────────────────────┘
-```
-
----
-
-## 🛠️ Стек
-
-| Компонент | Технология |
-|-----------|------------|
-| Backend | Python, FastAPI, uvicorn |
-| Данные | ccxt (Bybit), pandas |
-| График | mplfinance, plotly, kaleido |
-| VLM | Qwen3.6-35B-A3B-UD-Q4_K_XL (llama.cpp сервер, порт 8000) |
-| RAG | ChromaDB + sentence-transformers |
-| Хранение | SQLite (aiosqlite, sqlalchemy) |
-| Конфигурация | YAML (PyYAML) |
-| Тестирование | pytest, pytest-asyncio |
-| Утилиты | loguru, rich, python-dotenv |
-
----
-
-## 📂 Этапы разработки
-
-Порядок: 0→10. Этап 3 и 4 можно выполнять параллельно.
-
-### Этап 0. Scope и технические ограничения
-- Зафиксировать: инструменты, таймфреймы, модель, источники данных
-
-### Этап 1. Data pipeline
-- Получение OHLCV через `ccxt` / провайдер форекс
-- Нормализация: `timestamp, open, high, low, close, volume`
-- Сохранение в SQLite/PostgreSQL/Parquet
-
-### Этап 2. Chart renderer
-- Генерация PNG/SVG свечного графика из OHLCV
-- Вертикальные зоны сессий (Asian/London/NY)
-
-### Этап 3. Алгоритмический SMC-детектор ⚡
-**Критично важно для точности.** Rule-based детектор по OHLCV:
-- Swing High / Swing Low (fractals)
-- BOS / CHoCH (пробой структуры)
-- Order Block (последняя противоположная свеча перед импульсом)
-- Fair Value Gap (imbalance между свечами)
-- Liquidity sweep (прокол экстремума с возвратом)
-- **Output:** JSON с координатами всех найденных зон
-
-### Этап 4. База знаний (RAG)
-- Чанкование лекционных материалов по темам
-- Векторизация + локальная векторная БД
-- Query → релевантный чанк
-
-### Этап 5. Rules Engine
-- Сессии, дни недели, экономические события
-- Формализация правил в YAML/JSON
-- Трекер: что произошло → сверка с ожиданиями
-- Интеграция календаря новостей
-
-### Этап 6. Оркестратор
-- Сборка полного контекста для VLM: график + JSON паттернов + RAG чанки + статус правил
-- Промпт: интерпретировать, не искать с нуля
-
-### Этап 7. Структурированный вывод
-- JSON-схема: `bias`, `key_levels`, `narrative`, `session_status`, `confidence`
-- Constrained JSON от VLM
-
-### Этап 8. Backtesting / валидация
-- Прогон по истории → сравнение сценариев с реальностью
-- Метрики: % совпадения bias, % отработки уровней
-
-### Этап 9. UI / доставка
-- Веб-дашборд или Telegram-бот
-
-### Этап 10. Мониторинг и улучшение
-- Логирование промптов/ответов
-- Обратная связь → донастройка правил
-
----
-
-## 🐍 Виртуальное окружение
-
-```bash
-# Создание
-python -m venv .venv
-
-# Активация (Windows PowerShell)
+## Quick Start (Windows)
+```powershell
 .\.venv\Scripts\Activate.ps1
-
-# Активация (Linux/macOS)
-source .venv/bin/activate
-
-# Установка зависимостей
-pip install -r requirements.txt
+python -m pytest tests/ -v
 ```
 
-**Всегда работайте в активированном виртуальном окружении.**
+## Architecture
+```
+Bybit/ccxt → Data Pipeline → Chart Renderer ─┐
+  [symbols.yaml]                              ├→ Orchestrator → VLM → JSON
+  [db_schema.sql]                              │
+  [model_config.yaml] ── RAG ── Rules Engine ─┘
+```
 
----
+**Hybrid approach is mandatory.** Algorithmic detector (Stage 3) finds patterns from OHLCV. VLM only interprets — never determines price levels.
 
-## ⚠️ Важные правила для AI-агентов
+## Repo Map
 
-### Архитектурные принципы
-1. **Гибридный подход обязателен.** Никогда не полагайтесь только на VLM для определения ценовых уровней.
-2. **Этап 3 обязателен, не опционален.** Алгоритмический детектор — ядро точности системы.
-3. **Легальные источники данных.** TradingView скрапить нельзя — нарушение ToS.
+| Path | Purpose |
+|------|---------|
+| `config/symbols.yaml` | Symbols, timeframes (1W/1D/4H/1H/15m), session defs |
+| `config/model_config.yaml` | VLM (Qwen3.6-35B-A3B), server opts, system prompt |
+| `data/bybit_client.py` | ccxt wrapper — `BybitClient` |
+| `data/fetch_history.py` | Paginated history download (1000 candle/page) |
+| `data/fetch_realtime.py` | Last N candles for live analysis |
+| `data/db_manager.py` | SQLAlchemy ORM + raw SQL — `DBManager` |
+| `data/db_schema.sql` | Full schema: ohlcv, smc_patterns, session_results, analysis_runs |
+| `tests/` | pytest — mock-heavy for API, real SQLite for DB tests |
+| `requirements.txt` | Python deps |
 
-### Безопасность
-- Никогда не хардкодите API ключи
-- Используйте `.env` файлы (добавьте в `.gitignore`)
-- API ключи только для легальных провайдеров
+## Critical Gotchas
 
-### Стиль кода
-- PEP 8 для Python
-- Типизация (type hints) обязательна
-- Docstrings для всех публичных функций
-- Модульная структура: каждая ответственность — отдельный модуль
+**Symbol format:** `BybitClient.fetch_ohlcv()` expects `BTC/USDT` (ccxt format with slash). Config `symbols.yaml` lists `BTCUSDT` (no slash). Convert: `symbol.replace("USDT", "/USDT")`.
 
-### Документация
-- Обновляйте комментарии в коде
-- Добавляйте CHANGELOG.md для значимых изменений
+**DataFrame column naming:** ccxt returns → `Open, High, Low, Close, Volume` (capitalized). DB query returns → `open, high, low, close, volume` (lowercase). Don't mix them.
 
-### Definition of Done
-Каждый этап должен завершаться проверяемым результатом перед переходом к следующему.
+**DBManager uses sync SQLAlchemy, not async.** Despite `aiosqlite` in requirements, `DBManager` uses `sqlalchemy.orm.Session` (synchronous). For async, you'd need separate wrapper.
 
----
+**SQLite upsert:** Uses `INSERT OR IGNORE` (not `ON CONFLICT`). The unique index on `(symbol, timeframe, timestamp)` handles dedup. Chunk size for bulk is 500 (SQLite bind param limit is 999).
 
-## 🔑 Ключевые риски
+**VLM server:** `http://127.0.0.1:8000/v1` (llama.cpp + ollama-compatible endpoint). Model: `Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf`. Context: 98304. Must be running before orchestration.
 
-| Риск | Mitigation |
-|------|------------|
-| VLM неточна в координатах | Алгоритмический детектор по OHLCV |
-| TradingView API нарушает ToS | Использовать легальные провайдеры |
-| SMC/ICT дискреционный | Калибровка на реальных данных |
-| Ограничения VRAM | Выбор модели под доступное железо |
+**No linter/formatter configured.** Just `pytest` for verification. Follow PEP 8 + type hints + docstrings.
 
----
+## Development Workflow
 
-## 📞 Контакты
+**Stage order:** 0→10 (Stages 3+4 parallel). Each stage needs `Definition of Done` before advancing.
 
-Проект: `TZ_SMC_ICT_chart_analyzer.md` — основной документ ТЗ
+**For SMC algorithms (Stage 3+):** TDD is mandatory. Write `pytest` tests against hardcoded mock OHLCV candles *before* implementation. See `TODO.md` Stage 3 for file layout.
+
+**Commits:** One atomic commit per working unit. No large feature commits.
+
+**Branches:** No specific convention enforced. Use descriptive names.
+
+## Testing
+```powershell
+# All tests
+python -m pytest tests/ -v
+
+# Single file
+python -m pytest tests/test_data_pipeline.py -v
+
+# Single test
+python -m pytest tests/test_data_pipeline.py::TestFetchOHLCV::test_fetch_returns_dataframe -v
+```
+
+- `tests/test_bybit_client.py`: Mocked ccxt + live connection integration test
+- `tests/test_data_pipeline.py`: Real SQLite (temp file), 589 lines — covers CRUD, filters, edge cases, duplicates
+- `tests/test_fetch_history.py`: Mocked pagination, dedup, boundary filters
+
+## Key Constraints
+- TradingView scraping forbidden (ToS violation)
+- No hardcoded API keys — use `.env` (already in `.gitignore`)
+- Forex/DXY not on Bybit — need OANDA/ Twelve Data (placeholder in config)
+- SMC/ICT is partially discretionary — 100% algorithmic match to manual labeling is not the goal
