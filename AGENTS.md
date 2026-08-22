@@ -3,7 +3,7 @@
 ## Project: SMC/ICT Chart Analyzer
 **Goal:** Automated financial market analysis — algorithmic SMC/ICT pattern detection (OHLCV-based) + VLM interpretation.
 **Spec:** `TZ_SMC_ICT_chart_analyzer.md` | **Roadmap:** `TODO.md`
-**Status:** Stage 1 complete (data pipeline). Stages 3–4 ready to start.
+**Status:** Stages 0–2 complete (data pipeline + chart renderer). Stage 3 ready to start.
 
 ## Quick Start (Windows)
 ```powershell
@@ -28,11 +28,14 @@ Bybit/ccxt → Data Pipeline → Chart Renderer ─┐
 | `config/symbols.yaml` | Symbols, timeframes (1W/1D/4H/1H/15m), session defs |
 | `config/model_config.yaml` | VLM (Qwen3.6-35B-A3B), server opts, system prompt |
 | `data/bybit_client.py` | ccxt wrapper — `BybitClient` |
-| `data/fetch_history.py` | Paginated history download (1000 candle/page) |
+| `data/fetch_history.py` | Paginated history download (1000 candle/page) + `fetch_all_symbols` |
 | `data/fetch_realtime.py` | Last N candles for live analysis |
-| `data/db_manager.py` | SQLAlchemy ORM + raw SQL — `DBManager` |
+| `data/db_manager.py` | SQLAlchemy sync ORM — `DBManager` |
 | `data/db_schema.sql` | Full schema: ohlcv, smc_patterns, session_results, analysis_runs |
-| `tests/` | pytest — mock-heavy for API, real SQLite for DB tests |
+| `render/renderer.py` | mplfinance candlestick → PNG |
+| `render/chart_config.py` | Visual params (colors, background, margins) |
+| `render/sessions.py` | Session zone overlays (Asian/London/NY) |
+| `tests/` | pytest — mocks for API, real SQLite for DB, live-render for charts |
 | `requirements.txt` | Python deps |
 
 ## Critical Gotchas
@@ -74,6 +77,7 @@ python -m pytest tests/test_data_pipeline.py::TestFetchOHLCV::test_fetch_returns
 - `tests/test_bybit_client.py`: Mocked ccxt + live connection integration test
 - `tests/test_data_pipeline.py`: Real SQLite (temp file), 589 lines — covers CRUD, filters, edge cases, duplicates
 - `tests/test_fetch_history.py`: Mocked pagination, dedup, boundary filters
+- `tests/test_renderer.py`: Live BTC/USDT 1D fetch → mplfinance PNG to `tests/output/` (visual inspection)
 
 ## Key Constraints
 - TradingView scraping forbidden (ToS violation)
